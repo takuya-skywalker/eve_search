@@ -3,6 +3,7 @@ import 'package:eve_search/rss_item.dart';
 import 'package:eve_search/web_view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ogp_data_extract/ogp_data_extract.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webfeed_plus/webfeed_plus.dart';
@@ -69,12 +70,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _launchUrl(String url) async {
-  if (await canLaunchUrl(Uri.parse(url))) {
-    launchUrl(Uri.parse(url));
-  } else {
-    throw Exception('このリンク先にはアクセスできません');
+    if (await canLaunchUrl(Uri.parse(url))) {
+      launchUrl(Uri.parse(url));
+    } else {
+      throw Exception('このリンク先にはアクセスできません');
+    }
   }
-}
+
+  Future<String?> getOGPImageUrl(String url) async {
+    final data = await OgpDataExtract.execute(url);
+    return data?.image;
+  }
 
   void addOnlyHiphopList(){
     for(int i = 0; i <= allCategoryList.length; i++){
@@ -132,10 +138,33 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 550,
               width: MediaQuery.of(context).size.width,
               child: ListView.builder(
+                itemExtent: 80,
                 itemCount: allCategoryList.length,
                 itemBuilder: (context, index) {
                     return ListTile(
-                      leading: Text('test'),
+                      trailing: FutureBuilder<String?>(
+                        future: getOGPImageUrl(allCategoryList[index].linkUrl),
+                        builder: (context, snapshot) {
+                          if(snapshot.hasError){
+                            final error  = snapshot.error;
+                            return Text('$error', style: const TextStyle(fontSize: 12,),);
+                          }else if (snapshot.hasData) {
+                              String result = snapshot.data!;
+                              return FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Image.network(
+                                    result
+                                  ),
+                              );
+                          } else {
+                              return  Container(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator()
+                              );
+                          }
+                        }
+                      ),
                       title: Text(allCategoryList[index].title.toString()),
                       onTap:(){
                         setState(() {
