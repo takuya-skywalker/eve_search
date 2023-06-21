@@ -65,7 +65,10 @@ class _WebViewPageState extends State<WebViewPage> {
       body: Column(
         children: [
           if (_isLoading) const Center(
-            child: CircularProgressIndicator(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4),
+              child: CircularProgressIndicator(),
+            ),
           ),
           Expanded(child: WebViewWidget(controller: _controller)),
         ],

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ogp_data_extract/ogp_data_extract.dart';
 import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:webfeed_plus/webfeed_plus.dart';
 
 
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey
       ),
-      home: MyHomePage(title: 'SEARCH'),
+      home: const MyHomePage(title: 'SEARCH'),
     );
   }
 }
@@ -40,13 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _selectArea = '';
-  List<Rss> allCategoryList = [];
   List<Rss> onlyHiphopList = [];
-  @override
-  void initState() {
-    fetchFeed();
-    super.initState();
-  }
 
   Future<List<Rss>> fetchFeed() async {
     final response = await http
@@ -58,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // debugPrint(utf8.decode(response.bodyBytes));
     final rssFeed = RssFeed.parse(utf8.decode(response.bodyBytes));
     final rssItemlist = rssFeed.items ?? <RssItem>[];
-    allCategoryList = rssItemlist
+    final allCategoryList = rssItemlist
       .map(
         (item) => Rss(
           linkUrl: item.link ?? '',
@@ -66,28 +59,17 @@ class _MyHomePageState extends State<MyHomePage> {
           description: item.description ?? '',
         ),
       ).toList();
-      return allCategoryList;
+      //descriptionに’Hip Hop’を含んでいるインスタンスのみonlyHiphopListに追加する
+      for(int i = 0; i <= allCategoryList.length; i++){
+        if(allCategoryList[i].description.contains('Hip Hop')){
+          onlyHiphopList.add(allCategoryList[i]);
+        }
+      }
+      return onlyHiphopList;
   }
-
-  Future<void> _launchUrl(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      launchUrl(Uri.parse(url));
-    } else {
-      throw Exception('このリンク先にはアクセスできません');
-    }
-  }
-
   Future<String?> getOGPImageUrl(String url) async {
     final data = await OgpDataExtract.execute(url);
     return data?.image;
-  }
-
-  void addOnlyHiphopList(){
-    for(int i = 0; i <= allCategoryList.length; i++){
-      if(allCategoryList[i].description.contains('Hip Hop')){
-        onlyHiphopList.add(allCategoryList[i]);
-      }
-    }
   }
 
   @override
@@ -137,48 +119,51 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height: 550,
               width: MediaQuery.of(context).size.width,
-              child: ListView.builder(
-                // itemExtent: 80,
-                itemCount: allCategoryList.length,
-                itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
-                        trailing: FutureBuilder<String?>(
-                          future: getOGPImageUrl(allCategoryList[index].linkUrl),
-                          builder: (context, snapshot) {
-                            if(snapshot.hasError){
-                              final error  = snapshot.error;
-                              return Text('$error', style: const TextStyle(fontSize: 12,),);
-                            }else if (snapshot.hasData) {
-                              String result = snapshot.data!;
-                              return Container(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Image.network(
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                  result
-                                ),
-                              );
-                            } else {
-                                return  const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator()
+              child: FutureBuilder(
+                future: fetchFeed(),
+                builder: (context, snapshot) {
+                  return ListView.builder(
+                    itemCount: onlyHiphopList.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          trailing: FutureBuilder<String?>(
+                            future: getOGPImageUrl(onlyHiphopList[index].linkUrl),
+                            builder: (context, snapshot) {
+                              if(snapshot.hasError){
+                                final error  = snapshot.error;
+                                return Text('$error', style: const TextStyle(fontSize: 12,),);
+                              }else if (snapshot.hasData) {
+                                String result = snapshot.data!;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Image.network(
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    result
+                                  ),
                                 );
+                              } else {
+                                  return  const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator()
+                                  );
+                              }
                             }
-                          }
+                          ),
+                          title: Text(onlyHiphopList[index].title.toString()),
+                          onTap:(){
+                            setState(() {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewPage(rssUrl: onlyHiphopList[index].linkUrl)));
+                            });
+                          },
                         ),
-                        title: Text(allCategoryList[index].title.toString()),
-                        onTap:(){
-                          setState(() {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewPage(rssUrl: allCategoryList[index].linkUrl)));
-                            // _launchUrl(allCategoryList[index].linkUrl);
-                          });
-                        },
-                                      ),
-                    );
-                },
+                      );
+                    },
+                  );
+                }
               ),
             ),
           ],
@@ -187,4 +172,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
