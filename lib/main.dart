@@ -1,3 +1,4 @@
+import 'package:eve_search/cached_image.dart';
 import 'package:eve_search/prefectures_window.dart';
 import 'package:eve_search/rss_item.dart';
 import 'package:eve_search/web_view_page.dart';
@@ -59,6 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
           description: item.description ?? '',
         ),
       ).toList();
+      //hot reloadの度にリストに重複して追加されてしまうのを防ぐため。
+      onlyHiphopList = [];
       //descriptionに’Hip Hop’を含んでいるインスタンスのみonlyHiphopListに追加する
       for(int i = 0; i <= allCategoryList.length; i++){
         if(allCategoryList[i].description.contains('Hip Hop')){
@@ -136,13 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               }else if (snapshot.hasData) {
                                 String result = snapshot.data!;
                                 return Container(
+                                  width: 80,
+                                  height: 80,
                                   padding: const EdgeInsets.symmetric(vertical: 4),
-                                  child: Image.network(
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    result
-                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.fill,
+                                    child: CachedImage(
+                                      url: result,
+                                    ),
+                                  )
                                 );
                               } else {
                                   return  const SizedBox(
