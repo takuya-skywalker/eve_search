@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'const.dart';
 
 class PrefecturesWindow extends StatefulWidget {
@@ -11,7 +10,7 @@ class PrefecturesWindow extends StatefulWidget {
 class _PrefecturesWindowState extends State<PrefecturesWindow> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width*0.95,
       height: MediaQuery.of(context).size.height*0.95,
       child: Padding(
@@ -80,7 +79,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 東北 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 東北 ＞ $e');
                                     });
                                   },
                                 ),
@@ -130,7 +129,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 関東 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 関東 ＞ $e');
                                     });
                                   },
                                 ),
@@ -180,7 +179,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 中部 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 中部 ＞ $e');
                                     });
                                   },
                                 ),
@@ -230,7 +229,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 関西 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 関西 ＞ $e');
                                     });
                                   },
                                 ),
@@ -280,7 +279,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 中国 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 中国 ＞ $e');
                                     });
                                   },
                                 ),
@@ -330,7 +329,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 四国 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 四国 ＞ $e');
                                     });
                                   },
                                 ),
@@ -380,7 +379,7 @@ class _PrefecturesWindowState extends State<PrefecturesWindow> {
                                   ),
                                   onTap: (){
                                     setState(() {
-                                      Navigator.pop(context, ' ＞ 九州 ＞ ${e}');
+                                      Navigator.pop(context, ' ＞ 九州 ＞ $e');
                                     });
                                   },
                                 ),

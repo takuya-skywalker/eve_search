@@ -1,5 +1,5 @@
-class Blog {
-  const Blog({
+class Rss {
+  const Rss({
     required this.linkUrl,
     required this.title,
     required this.description,

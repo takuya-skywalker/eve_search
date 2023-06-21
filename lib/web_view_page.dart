@@ -3,55 +3,72 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatefulWidget {
-  const WebViewPage({super.key, required this.url});
-  final String url;
+  const WebViewPage({Key? key, required this.rssUrl}) : super(key: key);
+  final String rssUrl;
   @override
-  State<WebViewPage> createState() => _WebViewPageState(url: url);
+  State<WebViewPage> createState() => _WebViewPageState();
 }
 
 class _WebViewPageState extends State<WebViewPage> {
-  late final WebViewController controller;
-  String url;
-  final bool _isLoading = false;
-  final String _title = '';
-  _WebViewPageState({required this.url});
+  late final WebViewController _controller;
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
-    controller = WebViewController()
-      ..loadRequest(
-        Uri.parse(url),
-      );
-      
+    _controller = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (String url) {
+            setState(() {
+              _isLoading = true;
+            });
+          },
+          onPageFinished: (String url) {
+            setState(() {
+              _isLoading = false;
+            });
+          },
+        ),
+    )
+    ..loadRequest(Uri.parse(widget.rssUrl));
   }
-  // final WebViewController controller = WebViewController()
-  //   ..setNavigationDelegate(
-  //     NavigationDelegate(
-  //       onPageStarted: (String url){
-  //         setState(() {
-  //           _isLoading = true;
-  //         });
-  //       }
-  //     )
-  //   );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: Icon(Icons.clear),
-        title: Column(
-          children: [
-            const Text('イベント詳細'),
-            Text(widget.url,
-              style: TextStyle(fontSize: 10),
-            )
-          ],
+        leading: IconButton(
+          onPressed: (){ Navigator.pop(context);} ,
+          icon: const Icon(Icons.clear)
         ),
+        title: const Text('イベント詳細'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              _controller.goBack();
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
+              _controller.goForward();
+            },
+            icon: const Icon(
+              Icons.arrow_forward,
+            ),
+          )
+        ],
       ),
-      body: _isLoading ? const LinearProgressIndicator() 
-      : WebViewWidget(
-        controller: controller,
+      body: Column(
+        children: [
+          if (_isLoading) const Center(
+            child: CircularProgressIndicator(),
+          ),
+          Expanded(child: WebViewWidget(controller: _controller)),
+        ],
       ),
     );
   }

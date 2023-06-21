@@ -39,16 +39,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _result = '';
-  List<Blog> allCategoryList = [];
-  List<Blog> onlyHiphopList = [];
+  String _selectArea = '';
+  List<Rss> allCategoryList = [];
+  List<Rss> onlyHiphopList = [];
   @override
   void initState() {
     fetchFeed();
     super.initState();
   }
 
-  Future<List<Blog>> fetchFeed() async {
+  Future<List<Rss>> fetchFeed() async {
     final response = await http
       .get(Uri.parse('https://iflyer.tv/rss/events/'));
 
@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final rssItemlist = rssFeed.items ?? <RssItem>[];
     allCategoryList = rssItemlist
       .map(
-        (item) => Blog(
+        (item) => Rss(
           linkUrl: item.link ?? '',
           title: item.title ?? '',
           description: item.description ?? '',
@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     '全国',
                     style: TextStyle(fontSize: 16),
                   ),
-                  Text(_result,
+                  Text(_selectArea,
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -117,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed: () async{ 
-                String result = await showModalBottomSheet(
+                String selectArea = await showModalBottomSheet(
                   context: context,
                   isScrollControlled: true, 
                   shape: const RoundedRectangleBorder(
@@ -128,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 );
                 setState(() {
-                  _result = result;
+                  _selectArea = selectArea;
                 });
               },
               child: const Text('エリアを選択する',),
@@ -138,65 +138,49 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 550,
               width: MediaQuery.of(context).size.width,
               child: ListView.builder(
-                itemExtent: 80,
+                // itemExtent: 80,
                 itemCount: allCategoryList.length,
                 itemBuilder: (context, index) {
-                    return ListTile(
-                      trailing: FutureBuilder<String?>(
-                        future: getOGPImageUrl(allCategoryList[index].linkUrl),
-                        builder: (context, snapshot) {
-                          if(snapshot.hasError){
-                            final error  = snapshot.error;
-                            return Text('$error', style: const TextStyle(fontSize: 12,),);
-                          }else if (snapshot.hasData) {
+                    return Card(
+                      child: ListTile(
+                        trailing: FutureBuilder<String?>(
+                          future: getOGPImageUrl(allCategoryList[index].linkUrl),
+                          builder: (context, snapshot) {
+                            if(snapshot.hasError){
+                              final error  = snapshot.error;
+                              return Text('$error', style: const TextStyle(fontSize: 12,),);
+                            }else if (snapshot.hasData) {
                               String result = snapshot.data!;
-                              return FittedBox(
-                                fit: BoxFit.scaleDown,
+                              return Container(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
                                 child: Image.network(
-                                    result
-                                  ),
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  result
+                                ),
                               );
-                          } else {
-                              return  Container(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator()
-                              );
+                            } else {
+                                return  const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator()
+                                );
+                            }
                           }
-                        }
-                      ),
-                      title: Text(allCategoryList[index].title.toString()),
-                      onTap:(){
-                        setState(() {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewPage(url: allCategoryList[index].linkUrl)));
-                          // _launchUrl(allCategoryList[index].linkUrl);
-                        });
-                      },
-                  );
+                        ),
+                        title: Text(allCategoryList[index].title.toString()),
+                        onTap:(){
+                          setState(() {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewPage(rssUrl: allCategoryList[index].linkUrl)));
+                            // _launchUrl(allCategoryList[index].linkUrl);
+                          });
+                        },
+                                      ),
+                    );
                 },
               ),
             ),
-            // Text(allCategoryList[0].description.toString()),
-            // Text(allCategoryList[1].description.toString()),
-            // Text(allCategoryList[2].description.toString()),
-            // Text(allCategoryList[3].description.toString()),
-            // Text(allCategoryList[4].description.toString()),
-            // Text(allCategoryList[5].description.toString()),
-            // Text(allCategoryList[6].description.toString()),
-            // Text(allCategoryList[0].description.contains('Hip Hop').toString())
-            // Text(onlyHiphopList[1].title.toString()),
-            // Text(onlyHiphopList[0].linkUrl.toString()),
-            // Text(onlyHiphopList[1].linkUrl.toString()),
-            // ListView.builder(
-            //   itemCount: displayList.length,
-            //   itemBuilder: (context, index) {
-            //       return ListTile(
-            //         leading: Text(displayList[0].title.toString()),
-            //         title: Text(displayList[0].title.toString()),
-            //         onTap: () {},
-            //     );
-            //   },
-            // ),
           ],
         ),
       ),
