@@ -187,6 +187,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
               ),
             ),
+            Container(
+              padding: const EdgeInsets.only(right: 8),
+              alignment: Alignment.centerRight,
+              child: const Text('提供 :  iFLYER.tv',
+                style: TextStyle(fontSize: 10),
+              ),
+            )
           ],
         ),
       ),
