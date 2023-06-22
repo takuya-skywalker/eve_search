@@ -39,13 +39,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _selectArea = '';
+  List<String> _selectArea = ['', 'https://iflyer.tv/rss/events'];
   List<Rss> onlyHiphopList = [];
-
+  String areaUrl = '';
   Future<List<Rss>> fetchFeed() async {
     final response = await http
-      .get(Uri.parse('https://iflyer.tv/rss/events/'));
-
+      .get(Uri.parse(_selectArea[1]));
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch');
     }
@@ -60,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
           description: item.description ?? '',
         ),
       ).toList();
-      //hot reloadの度にリストに重複して追加されてしまうのを防ぐため。
+      //hot reloadの度にインスタンスがリストに重複して追加されてしまうのを防ぐため。
       onlyHiphopList = [];
       //descriptionに’Hip Hop’を含んでいるインスタンスのみonlyHiphopListに追加する
       for(int i = 0; i <= allCategoryList.length; i++){
@@ -94,15 +93,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     '全国',
                     style: TextStyle(fontSize: 16),
                   ),
-                  Text(_selectArea,
+                  Text(_selectArea[0],
                     style: const TextStyle(fontSize: 16),
-                  ),
+                  )
                 ],
               ),
             ),
             ElevatedButton(
               onPressed: () async{ 
-                String selectArea = await showModalBottomSheet(
+                List<String> selectArea = await showModalBottomSheet(
                   context: context,
                   isScrollControlled: true, 
                   shape: const RoundedRectangleBorder(
@@ -151,14 +150,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                 );
                               } else {
                                   return  const SizedBox(
-                                    height: 20,
-                                    width: 20,
+                                    height: 80,
+                                    width: 80,
                                     child: CircularProgressIndicator()
                                   );
                               }
                             }
                           ),
-                          title: Text(onlyHiphopList[index].title.toString()),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(onlyHiphopList[index].title.substring(0, 11),
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(onlyHiphopList[index].title.substring(12, onlyHiphopList[index].title.toString().indexOf('@'))),
+                              ),
+                              Container(
+                                alignment: Alignment.centerRight,
+                                child: Text(onlyHiphopList[index].title.substring(onlyHiphopList[index].title.toString().indexOf('@')),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
                           onTap:(){
                             setState(() {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewPage(rssUrl: onlyHiphopList[index].linkUrl)));
