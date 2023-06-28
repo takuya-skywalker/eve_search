@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 16,),
             SizedBox(
-              height: 550,
+              height: MediaQuery.of(context).size.height*0.7,
               width: MediaQuery.of(context).size.width,
               child: FutureBuilder(
                 future: fetchFeed(),
