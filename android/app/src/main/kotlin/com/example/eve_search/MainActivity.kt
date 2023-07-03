@@ -1,4 +1,4 @@
-package com.example.eve_search
+package com.afua.eve_search
 
 import io.flutter.embedding.android.FlutterActivity
 
