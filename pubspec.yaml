@@ -43,12 +43,19 @@ dependencies:
   ogp_data_extract: ^0.1.2
   cached_network_image: ^3.2.3
   flutter_cache_manager: ^3.3.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true 
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#607D8B"
   
 flutter_native_splash:
-  color: '#1E1E1E'
+  color: '#607D8B'
   image: assets/images/afua_splash.png
   android_12:
-    icon_background_color: '#1E1E1E'
+    icon_background_color: '#607D8B'
     image: assets/images/afua_splash_android.png
 
 
